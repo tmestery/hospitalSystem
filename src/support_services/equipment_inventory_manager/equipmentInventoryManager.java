@@ -1,10 +1,11 @@
-package Equipment_Inventory_Manager;
+package support_services.equipment_inventory_manager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class main {
+public class equipmentInventoryManager {
     
+    private String systemID;
     private static Scanner scanner = new Scanner(System.in);
     private static hospitalTechnician hospitalTech;
     private static inventory inventory = new inventory(new ArrayList<>());
@@ -22,6 +23,10 @@ public class main {
         } else {
             System.out.println("\n\n\n--------------------Logging Out--------------------");
         }
+    }
+
+    public equipmentInventoryManager(String systemID) {
+        this.systemID = systemID;
     }
 
     // Logs in as technician

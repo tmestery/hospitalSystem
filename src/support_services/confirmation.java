@@ -1,9 +1,8 @@
-package src;
+package support_services;
 import java.time.LocalDateTime;
 
 public interface confirmation {
     String getEquipmentID();
     LocalDateTime getTimestamp();
-    status getStatus();
     String getMessage();
 }

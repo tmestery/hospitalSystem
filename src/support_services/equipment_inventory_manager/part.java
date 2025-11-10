@@ -1,4 +1,4 @@
-package Equipment_Inventory_Manager;
+package support_services.equipment_inventory_manager;
 
 public class part {
 

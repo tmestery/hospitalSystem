@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import support_services.equipment_inventory_manager.equipmentInventoryManager;
 
 public class main {
     private static Boolean running;
@@ -22,24 +23,20 @@ public class main {
     }
 
     public static void menuOptions() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter the service you want to enter (1, 2, 3, 4, 5): ");
-        String choice = scanner.next();
-        
-        if (choice.equals(1)) {
-
-        } else if (choice.equals(2)) {
-
-        } else if (choice.equals(3)) {
-            
-        } else if (choice.equals(4)) {
-
-        } else if (choice.equals(5)) {
-
-        } else {
-            running = false;
+    Scanner scanner = new Scanner(System.in);
+    System.out.println("Enter the service you want to enter (1, 2, 3, 4, 5): ");
+    String choice = scanner.nextLine().trim();
+    
+    switch (choice) {
+        case "1" -> callAdmistrativeServices();
+        case "2" -> callDiagnosticServices();
+        case "3" -> callMedicalServices();
+        case "4" -> callNursingServices();
+        case "5" -> callSupportServices();
+        default -> running = false;
         }
     }
+
 
     public static void callAdmistrativeServices() {
     }
@@ -54,5 +51,6 @@ public class main {
     }
 
     public static void callSupportServices() {
+        equipmentInventoryManager.main(new String[]{}); 
     }
 }

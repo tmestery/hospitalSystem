@@ -1,4 +1,4 @@
-package Equipment_Inventory_Manager;
+package support_services.equipment_inventory_manager;
 import java.util.List;
 
 public class repairRecord {
