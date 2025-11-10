@@ -1,0 +1,24 @@
+[
+	{
+		"firstName": "Brok",
+		"lastName": "Nee",
+		"id": 8934
+	},
+	
+	{
+		"firstName": "Fig",
+		"lastName": "Au",
+		"id": 7364,
+		"prevCharts": [
+			{
+				"patientId": 7364,
+				"chartId": 8972,
+				"userIdIss": 1234,
+				"dateIss": "Nov 6, 2025",
+				"others": [9852, 6928],
+				"allergies": "Staying Alive",
+				"additionalNotes": "No clue what the hell is wrong with them."
+			}
+		]
+	}
+],
