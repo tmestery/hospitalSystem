@@ -11,9 +11,9 @@ public class FilerSystem {
 	private LinkedHashMap<Integer, Nurse> nurses = new LinkedHashMap<>();
 	private LinkedHashMap<Integer, Patient> patients = new LinkedHashMap<>();
 	private LinkedHashMap<Integer, Chart> charts = new LinkedHashMap<>();
-	private static final String PATH_DOC = "./Json/doctors.json";
-	private static final String PATH_NUR = "./Json/nurses.json";
-	private static final String PATH_PAT = "./Json/patients.json";
+	private static final String PATH_DOC = "./src/diagnostic_services/file_system/Data/doctors.json";
+	private static final String PATH_NUR = "./src/diagnostic_services/file_system/Data/nurses.json";
+	private static final String PATH_PAT = "./src/diagnostic_services/file_system/Data/patients.json";
 	
 	public FilerSystem() {
 		load();
@@ -115,14 +115,17 @@ public class FilerSystem {
 						split = line.split(":");
 						split = split[1].split(",");
 						for (int j = 0; j < split.length; j++) {
-							int p = Integer.parseInt(split[j].replace("[", "").replace("]", "").strip());
-							
+							String otherId = split[j].replace("[", "").replace("]", "").strip();
+							if (otherId.isEmpty()) {
+								continue;
+							}
+									
+							int p = Integer.parseInt(otherId);
 							if (doctors.get(p) != null) {
 								chart.addOthers(doctors.get(p));
 							} else if (nurses.get(p) != null) {
 								chart.addOthers(nurses.get(p));
 							}
-							
 						}
 					} else if (line.contains("allergies")) {
 						split = line.split(":");
