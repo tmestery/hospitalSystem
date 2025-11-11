@@ -49,13 +49,15 @@ public class Chart {
 	
 	@Override
 	public String toString() {
+		
 		return " Chart Id: " + chartId + "\n" +
 				" Patient: " + patient + "\n" +
 				" Issued by: " + user + "\n" +
 				" Date Issued: " + date + "\n" +
 				" Others: " + others + "\n" +
 				" Allergies: " + allergies + "\n" +
-				" Notes: " + notes + "\n";
+				" Notes: " + notes + "\n" +
+				"--------------------------------------------------------------------------- \n";
 		
 	}
 }
