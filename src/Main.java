@@ -51,7 +51,7 @@ public class Main {
     }
 
     public static void callMedicalServices() {
-    	MedMain.main(new String[]{});
+    	medical_services.MedicalUseCaseSelector.main(new String[]{});
     }
 
     public static void callNursingServices() {
