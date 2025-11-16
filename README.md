@@ -13,3 +13,6 @@ javac -d out src/**/*.java
 ```bash
 java -cp out Main
 ```
+
+## Contributers:
+Ayan Asim, Austin Das, Dan Habiger, Harshith Jaladi, & Tyler Mestery
