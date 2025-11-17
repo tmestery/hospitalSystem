@@ -12,3 +12,4 @@ Icon?
 *.bak
 *.DS_Store?
 /.project
+.classpath
