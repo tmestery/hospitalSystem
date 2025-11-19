@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.UUID;
 
 public class MedicalSystem {
@@ -84,6 +85,75 @@ public class MedicalSystem {
     
     public List<TestRequest> getRequests() {
     	return requests;
+    }
+    
+    
+
+    public void updatePatientMedicalRecord(Scanner sc) {
+
+    	if (patients.isEmpty()) {
+    		System.out.println("No patients exist in the system.");
+    		return;
+    	}
+
+    	// Display patient list
+    	List<Patient> list = new ArrayList<>(patients.values());
+    	System.out.println("\n=== Select a Patient ===");
+    	for (int i = 0; i < list.size(); i++) {
+    		System.out.println((i + 1) + ") " + list.get(i).getFullName() +
+                           " (DOB: " + list.get(i).getDateOfBirth() + ")");
+    	}
+
+    	// Patient selection
+    	Patient p = null;
+    	while (p == null) {
+    		System.out.print("Enter patient number: ");
+    		try {
+    			int choice = Integer.parseInt(sc.nextLine());
+    			if (choice < 1 || choice > list.size()) {
+    				System.out.println("Invalid choice. Try again.");
+    			} else {
+    				p = list.get(choice - 1);
+    			}
+    		} catch (Exception e) {
+    			System.out.println("Enter a valid number.");
+    		}
+    	}
+
+    	MedicalRecord rec = p.getMedicalRecord();
+    	System.out.println("\n=== Current Medical Record ===");
+    	System.out.println(rec);
+
+    	// Select what to update
+    	System.out.println("\nWhat would you like to update?");
+    	System.out.println("1) Diagnosis");
+    	System.out.println("2) Allergies");
+    	System.out.println("3) Notes");
+
+    	int updateChoice = 0;
+    	while (updateChoice < 1 || updateChoice > 3) {
+    		System.out.print("Enter new information: ");
+    		try {
+    			updateChoice = Integer.parseInt(sc.nextLine());
+    		} catch (Exception ignored) {}
+    	}
+
+    	System.out.print("Enter new value: ");
+    	String newValue = sc.nextLine().trim();
+    	while (newValue.isBlank()) {
+    		System.out.print("Value cannot be blank. Enter again: ");
+    		newValue = sc.nextLine().trim();
+    	}
+
+    	switch (updateChoice) {
+        	case 1 -> rec.setDiagnosis(newValue);
+        	case 2 -> rec.setAllergies(newValue);
+        	case 3 -> rec.setNotes(newValue);
+    	}
+
+    	System.out.println("\nRecord updated successfully!");
+    	System.out.println("=== Updated Record ===");
+    	System.out.println(rec);
     }
 
 }

@@ -8,12 +8,14 @@ public class Patient {
 	 final UUID patientID;
 	 final String fullName;
 	 final LocalDate dateOfBirth;
+	 private MedicalRecord medicalRecord;
 	
 	public Patient(UUID patientID, String fullName, LocalDate dateOfBirth)
 	{
 		this.patientID = patientID;
 		this.fullName = fullName;
 		this.dateOfBirth = dateOfBirth;
+		this.medicalRecord = new MedicalRecord();
 	}
 	
 	public UUID getPatientID()
@@ -28,6 +30,12 @@ public class Patient {
 	{
 		return dateOfBirth;
 	}
+	
+	 public MedicalRecord getMedicalRecord() 
+	 {
+	    return medicalRecord;
+	 }
+	
 	@Override public String toString() 
 	{
 		return fullName + " ( DOB:" + dateOfBirth + ") ";
