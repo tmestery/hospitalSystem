@@ -1,9 +1,9 @@
-import java.util.Scanner;
 import administrative_services.onboarding_manager.ConsoleApp;
 import diagnostic_services.DiagMain;
-import medical_services.MedMain;
+import java.util.Scanner;
 import nursing_services.NurMain;
 import support_services.equipment_inventory_manager.equipmentInventoryManager;
+import support_services.cleaningStaff;
 
 public class Main {
     private static Boolean running;
@@ -59,6 +59,26 @@ public class Main {
     }
 
     public static void callSupportServices() {
-        equipmentInventoryManager.main(new String[]{}); 
+        displaySupportServicesOptions();
+    }
+
+    public static void displaySupportServicesOptions() {
+        System.out.println("---------------------------------Support Services Menu---------------------------------");
+        System.out.println("1. Maintenance Staff");
+        System.out.println("2. Cleaning Staff");
+        System.out.println("---------------------------------------------------------------------------");
+        supportServicesMenu();
+    }
+
+    public static void supportServicesMenu() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the manager you want to enter (1, 2, 3): ");
+        String choice = scanner.nextLine().trim();
+        
+        switch (choice) {
+            case "1" -> equipmentInventoryManager.main(new String[]{});
+            case "2" -> cleaningStaff.main(new String[]{}); 
+            default -> running = false;
+            }
     }
 }
