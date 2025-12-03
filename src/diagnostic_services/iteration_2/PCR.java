@@ -20,12 +20,20 @@ public class PCR {
     this.notes = notes;
   }
 
+  public void setId(int id) {
+    this.id = id;
+  }
+
   public int getId() {
     return id;
   }
 
   public Ambulance getAmbulance() {
     return ambulance;
+  }
+
+  public void setPatient(Patient patient) {
+    this.patient = patient;
   }
 
   public Patient getPatient() {
@@ -42,10 +50,18 @@ public class PCR {
 
   @Override
   public String toString() {
-    return  "PRC ID: " + id +
-            "\nEMTs: " + ambulance.emt.get(0).getFirstName() + " " + ambulance.emt.get(0).getLastName() +
-            ", " + ambulance.emt.get(1).getFirstName() + " " + ambulance.emt.get(1).getLastName() +
-            "\nPatient: " + patient.getFirstName() + " " + patient.getLastName() +
-            "\nNotes: " + notes;
+    if (patient != null) {
+      return  "PCR ID: " + id +
+              "\nEMTs: " + ambulance.emt.get(0).getFirstName() + " " + ambulance.emt.get(0).getLastName() +
+              ", " + ambulance.emt.get(1).getFirstName() + " " + ambulance.emt.get(1).getLastName() +
+              "\nPatient: " + patient.getFirstName() + " " + patient.getLastName() +
+              "\nNotes: " + notes;
+    } else {
+      return "PCR ID: " + id +
+              "\nEMTs: " + ambulance.emt.get(0).getFirstName() + " " + ambulance.emt.get(0).getLastName() +
+              ", " + ambulance.emt.get(1).getFirstName() + " " + ambulance.emt.get(1).getLastName() +
+              "\nPatient: " + "Null" +
+              "\nNotes: " + notes;
+    }
   }
 }

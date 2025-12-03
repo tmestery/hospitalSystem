@@ -7,12 +7,19 @@ public class Chart {
 	private Patient patient;
 	private Integer chartId;
 	private HealthCareProvider user;
-	private String date;
+	private String date = "Dec 3, 2025";
 	private final ArrayList<HealthCareProvider> others = new ArrayList<>();
 	private String allergies;
 	private String notes;
 
 	public Chart() {}
+
+	public Chart(HealthCareProvider user, Patient patient, String notes) {
+		this.user = user;
+		this.patient = patient;
+		this.others.addAll(others);
+		this.notes = notes;
+	}
 
 	public void addNote(String str) {
 		notes = str;

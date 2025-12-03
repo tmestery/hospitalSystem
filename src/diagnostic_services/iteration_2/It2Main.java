@@ -78,7 +78,7 @@ public class It2Main {
                             }
                         }
                     }
-                    case "3" -> fs.createPCR(id);
+                    case "3" -> fs.createPCR(id, sc);
                     case "4" -> {
                         while (true) {
                             System.out.print("Enter PCR ID: ");
@@ -87,7 +87,7 @@ public class It2Main {
 
                             try {
                                 int _id = Integer.parseInt(_in);
-                                fs.editPCR(_id);
+                                fs.editPCR(_id, sc);
                                 break;
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid ID, please try again.\n");
@@ -142,13 +142,8 @@ public class It2Main {
                     }
                     case "3" -> {
                         while (true) {
-                            System.out.print("Enter Sample ID: ");
-                            String _in = sc.nextLine();
-                            System.out.println();
-
                             try {
-                                int _id = Integer.parseInt(_in);
-                                fs.submitSample(_id);
+                                fs.submitSample(sc);
                                 break;
                             } catch (NumberFormatException e) {
                                 System.out.println("Invalid ID, please try again.\n");

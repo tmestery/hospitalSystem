@@ -4,23 +4,33 @@ import java.util.LinkedHashMap;
 import roles.Patient;
 
 public class Sample {
-  int id = 0;
+  private int id = 0;
   private final String sampleType;
   private Status status;
   private final Patient patient;
   private final LinkedHashMap<String, String> results = new LinkedHashMap<>();
 
-  public Sample(String sampleType, Patient patient) {
+  public Sample(int id, String sampleType, Patient patient) {
+    this.id = id;
     this.sampleType = sampleType;
     this.patient = patient;
     this.status = Status.PENDING;
   }
 
   public Sample(int id, String sampleType, Status status, Patient patient, LinkedHashMap<String, String> results) {
+    this.id = id;
     this.sampleType = sampleType;
     this.status = status;
     this.patient = patient;
     this.results.putAll(results);
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
   }
 
   public Patient getPatient() {

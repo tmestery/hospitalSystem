@@ -27,12 +27,11 @@ public class DiagMain {
 				try {
 					userId = Integer.parseInt(in);
 				} catch (Exception e) {
-					System.out.println("Invalid id, please try again: " + e.getMessage());
-					System.out.print("> ");
+					System.out.print("Invalid id, please try again: ");
 				}
 			}
 
-			verified = fs.isHealthCareProvider(userId);
+			verified = fs.isHealthCareProvider(userId) || fs.isLabTech(userId) || fs.isEMT(userId);
 			if (!verified) {
 				System.out.print("Invalid id, please try again: ");
 			}
@@ -63,25 +62,28 @@ public class DiagMain {
 							"""
 							Chart_System
 							Select an option:
-							1) Display all charts
+							1) Display All Charts
+							2) Create Chart
 							2) Exit Chart System
 							>\s"""
 						);
 						in = sc.nextLine();
 						System.out.println();
 
-						switch(Integer.parseInt(in)) {
-							case 1 -> {
-									fs.displayCharts();
-								}
-							case 2 -> running = false;
+						switch(in) {
+							case "1" -> {
+								fs.displayCharts();
+							}
+							case "2" -> {
+								fs.submitChart(userId, sc);
+							}
+							case "3" -> running = false;
 						}
 					}
 					case 2 -> It2Main.sampleManager(userId, fs, sc);
 					case 3 -> It2Main.pcrReporter(userId, fs, sc);
 					case 4 -> {
 						running = false;
-						sc.close();
 					}
 				}
 			}

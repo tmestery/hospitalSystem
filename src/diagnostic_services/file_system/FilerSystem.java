@@ -6,6 +6,8 @@ import diagnostic_services.iteration_2.Sample;
 import diagnostic_services.iteration_2.Status;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Scanner;
 import java.util.Set;
@@ -26,6 +28,8 @@ public class FilerSystem {
 	private static final String PATH_PAT = "./src/diagnostic_services/file_system/Data/patients.json";
 	private static final String PATH_LAB = "./src/diagnostic_services/file_system/Data/labtechs.json";
 	private static final String PATH_EMT = "./src/diagnostic_services/file_system/Data/emts.json";
+	private static final String PATH_SAM = "./src/diagnostic_services/file_system/Data/samples.json";
+	private static final String PATH_PCR = "./src/diagnostic_services/file_system/Data/pcrs.json";
 
 
 	public FilerSystem() {
@@ -348,9 +352,86 @@ public class FilerSystem {
 		System.out.println(samples.get(id));
 	}
 
-  public void submitSample(int id) {
-    Sample sample = samples.get(id);
-		sample.setStatus(Status.PENDING);
+	public void submitChart(int id, Scanner sc) {
+		HealthCareProvider user;
+		Patient patient;
+
+		if (doctors.containsKey(id)) {
+			user = doctors.get(id);
+		} else if (nurses.containsKey(id)) {
+			user = nurses.get(id);
+		} else {
+			System.out.println("Invalid user.");
+			return;
+		}
+
+		while (true) {
+				System.out.print("Patient id: ");
+				String in = sc.nextLine();
+				int patientId;
+
+				patientId = Integer.parseInt(in);
+				if (patients.containsKey(patientId)) {
+					patient = patients.get(patientId);
+					break;
+				} else if (in.equalsIgnoreCase("exit")) {
+					return;
+				} else {
+					System.out.println("Invalid patient id, please try again.");
+				}
+		}
+
+		Chart chart = new Chart(user, patient, PATH_DOC);
+
+		System.out.println("Please enter any allegeries. (Do not use semicolons).");
+		String allergies = sc.nextLine();
+		chart.addAllergies(allergies);
+
+		System.out.println("Please enter any additional notes. (Do not use semicolons).");
+		String notes = sc.nextLine();
+		chart.addNote(notes);
+
+		chart.setChartId(charts.size() + 1);
+		charts.put(chart.getId(), chart);
+
+		System.out.println("Chart submitted successfully!\n");
+	}
+
+  public void submitSample(Scanner sc) {
+		String sampleType;
+		Patient patient;
+
+		while (true) {
+			System.out.println("Input patient Id: ");
+			String in = sc.nextLine();
+			int patientId = Integer.parseInt(in);
+
+			if (in.equalsIgnoreCase("exit")) {
+				return;
+			} else if (patients.containsKey(patientId)) {
+				patient = patients.get(patientId);
+				break;
+			} else {
+				System.out.println("Invalid patient id, please try again or type 'exit' to cancel.\n");
+			}
+		}
+
+		System.out.println("Input sample type: ");
+		sampleType = sc.nextLine();
+
+		Sample sample = new Sample(samples.size() + 1, sampleType, patient);
+
+		LinkedHashMap<String, String> results = new LinkedHashMap<>();
+		while (true) {
+				System.out.println("Enter fields you would like to add to result. Press enter to stop.");
+				String field = sc.nextLine();
+				if (field.isBlank()) {
+					break;
+				}
+				results.put(field, "NULL");
+		}
+    sample.setResults(results);
+    samples.put(sample.getId(), sample);
   }
 
 	public void editSample(int id) {
@@ -389,28 +470,222 @@ public class FilerSystem {
 		System.out.println("\n Total amount of pcrs: " + pcrs.size() + "\n");
 	}
 
-  public void editPCR(int id) {
-		pcrs.get(id);
+  public void editPCR(int id, Scanner sc) {
+		PCR pcr = pcrs.get(id);
 
+		System.out.println("Enter any notes you would like. Or enter to skip.");
+		String notes = sc.nextLine();
+
+		if (!notes.isEmpty()) {
+			pcr.setNotes(pcr.getNotes() + " " + notes);
+		}
+
+		System.out.print("PCR enter patient id or 'enter' to skip: ");
+		String in = sc.nextLine();
+
+		if (!in.isBlank()) {
+			int patientId = Integer.parseInt(in);
+			Patient patient = patients.get(patientId);
+			pcr.setPatient(patient);
+		}
   }
 
-  public void createPCR(int emtId) {
+  public void createPCR(int emtId, Scanner sc) {
 		EMT emt1 = emts.get(emtId);
 
 		while (true) {
 			System.out.println("Enter the second EMT's ID: ");
-			Scanner sc = new Scanner(System.in);
 
 			try {
 					emtId = Integer.parseInt(sc.nextLine());
+					if (!emts.containsKey(emtId)) {
+						System.out.println("Invalid id, please try again.");
+						continue;
+					}
 					break;
 			} catch (Exception e) {
-				e.printStackTrace();
+					System.out.println("Invalid id, please try again.");
 			}
 		}
 
 		EMT emt2 = emts.get(emtId);
+
+
     PCR pcr = new PCR(emt1, emt2);
+		pcr.setId(pcrs.size() + 1);
 		pcrs.put(pcr.getId(), pcr);
+
+		System.out.println();
   }
+
+	private class FileWriter {
+
+		public static void writeJsonToFile(String filePath, String json) {
+			FileWriter.writeToFile(filePath, json);
+		}
+
+		public static void clearFile(String filePath) {
+			FileWriter.eraseFileContents(filePath);
+		}
+	}
+
+	public void saveData() {
+		writeDoctors();
+		writeNurses();
+		writeEMTs();
+		writeLabTechs();
+		writePatients();
+		writeSamples();
+		writePCRs();
+	}
+
+	private void writeDoctors() {
+		Doctors[] _doctors = doctors.values();
+		String content = "[\n";
+
+		for (Doctor doctor : _doctors) {
+			String json = """
+					{
+						"firstName": "%s",
+						"lastName": "%s",
+						"id": %d
+					}
+					"""
+				.formatted(doctor.getFirstName(), doctor.getLastName(), doctor.getId());
+			content = content + json;
+		}
+		content = content + "\n]";
+		FileWriter.writeJsonToFile(PATH_DOC, content);
+	}
+
+	private void writeNurses() {
+		Nurses[] _nurses = nurses.values();
+		String content = "[\n";
+		for (Nurse nurse : _nurses) {
+			String json = """
+					{
+						"firstName": "%s",
+						"lastName": "%s",
+						"id": %d
+					}
+					"""
+				.formatted(nurse.getFirstName(), nurse.getLastName(), nurse.getId());
+			content = content + json;
+		}
+		content = content + "\n]";
+		FileWriter.writeJsonToFile(PATH_NUR, content);
+	}
+
+	private void writeEMTs() {
+		EMTs[] _emts = emts.values();
+		String content = "[\n";
+		for (roles.EMT emt : _emts) {
+			String json = """
+					{
+						"firstName": "%s",
+						"lastName": "%s",
+						"id": %d
+					}
+					"""
+				.formatted(emt.getFirstName(), emt.getLastName(), emt.getId());
+			content = content + json;
+		}
+		content = content + "\n]";
+		FileWriter.writeJsonToFile(PATH_EMT, content);
+	}
+
+	private void writeLabTechs() {
+		LabTechs[] _labTechs = labTechs.values();
+		String content = "[\n";
+		for (LabTech labTech : _labTechs) {
+			String json = """
+					{
+						"firstName": "%s",
+						"lastName": "%s",
+						"id": %d
+					}
+					"""
+				.formatted(labTech.getFirstName(), labTech.getLastName(), labTech.getId());
+			content = content + json;
+		}
+		content = content + "\n]";
+		FileWriter.writeJsonToFile(PATH_LAB, content);
+	}
+
+	private void writePatients() {
+		Chart[] _charts = charts.values();
+		for (Chart chart : _charts) {
+			Patient patient = chart.getPatient();
+
+		}
+
+		Patients[] _patients = patients.values();
+		String content = "[\n";
+		for (Patient patient : _patients) {
+			String json = """
+					{
+						"firstName": "%s",
+						"lastName": "%s",
+						"id": %d,
+						"prevCharts": []
+					}
+					"""
+				.formatted(patient.getFirstName(), patient.getLastName(), patient.getId());
+			content = content + json;
+		}
+		content = content + "\n]";
+		FileWriter.writeJsonToFile(PATH_PAT, content);
+	}
+
+	private void writeSamples() {
+		Samples[] _samples = samples.values();
+		String content = "[\n";
+		for (Sample sample : _samples) {
+			String json = """
+					{
+						"id": %d,
+						"sampleType": "%s",
+						"status": "%s",
+						"patient": %d,
+						"results": %s
+					}
+					"""
+				.formatted(
+					sample.getId(),
+					sample.getSampleType(),
+					sample.getStatus().toString(),
+					sample.getPatient().getId(),
+					sample.getResults().toString()
+				);
+			content = content + json;
+		}
+		content = content + "\n]";
+		FileWriter.writeJsonToFile(PATH_SAM, content);
+	}
+
+	private void writePCRs() {
+		PCRs[] _pcrs = pcrs.values();
+		String content = "[\n";
+		for (PCR pcr : _pcrs) {
+			String json = """
+					{
+						"id": %d,
+						"patient": %d,
+						"emts": [%d, %d],
+						"notes": "%s"
+					}
+					"""
+				.formatted(
+					pcr.getId(),
+					pcr.getPatient().getId(),
+					pcr.getAmbulance().getEmt().get(0).getId(),
+					pcr.getAmbulance().getEmt().get(1).getId(),
+					pcr.getNotes()
+				);
+			content = content + json;
+		}
+		content = content + "\n]";
+		FileWriter.writeJsonToFile(PATH_PCR, content);
+	}
+
 }
