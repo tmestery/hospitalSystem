@@ -197,8 +197,6 @@ public class FoodAndNutritionManager {
                 default -> System.out.println("Invalid option.");
             }
         }
-
-        scanner.close();
     }
 
     private void updateKitchenStatus(Scanner scanner) {
