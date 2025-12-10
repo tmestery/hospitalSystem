@@ -2,6 +2,7 @@ package diagnostic_services.iteration_2;
 
 import java.util.LinkedHashMap;
 import roles.Patient;
+import diagnostic_services.file_system.Status;
 
 public class Sample {
   private int id = 0;

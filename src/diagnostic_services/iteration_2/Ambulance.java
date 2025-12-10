@@ -13,6 +13,10 @@ public class Ambulance {
     this.emt.add(emt2);
   }
 
+  public ArrayList<EMT> getEMT() {
+    return emt;
+  }
+
   public void setPatient(Patient patient) {
     this.patient = patient;
   }

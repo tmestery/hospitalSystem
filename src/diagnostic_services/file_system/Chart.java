@@ -7,7 +7,7 @@ public class Chart {
 	private Patient patient;
 	private Integer chartId;
 	private HealthCareProvider user;
-	private String date = "Dec 3, 2025";
+	private String date = "Dec 10, 2025";
 	private final ArrayList<HealthCareProvider> others = new ArrayList<>();
 	private String allergies;
 	private String notes;
@@ -21,8 +21,28 @@ public class Chart {
 		this.notes = notes;
 	}
 
+	public HealthCareProvider getUser() {
+		return user;
+	}
+
+	public Patient getPatient() {
+		return patient;
+	}
+
 	public void addNote(String str) {
 		notes = str;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public ArrayList<HealthCareProvider> getOthers() {
+		return others;
+	}
+
+	public String getAllergies() {
+		return allergies;
 	}
 
 	public void addAllergies(String all) {
@@ -35,6 +55,10 @@ public class Chart {
 
 	public void setDate(String date) {
 		this.date = date;
+	}
+
+	public String getDate() {
+		return date;
 	}
 
 	public void setUser(HealthCareProvider person) {

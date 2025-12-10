@@ -1,6 +1,7 @@
 package diagnostic_services;
 
 import diagnostic_services.file_system.*;
+import diagnostic_services.iteration3.BiopsyMain;
 import diagnostic_services.iteration_2.It2Main;
 import java.util.Scanner;
 
@@ -9,44 +10,21 @@ public class DiagMain {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		FilerSystem fs = new FilerSystem();
-		int userId = 0;
 
-		boolean verified = false;
 		boolean running = true;
 		System.out.println();
-		System.out.println("Please log in.");
-		System.out.println("'Exit': leave diagnostic services.");
-		System.out.print("User id: ");
-
-		while (!verified) {
-			String in = sc.nextLine();
-
-			if (in.equalsIgnoreCase("exit")) {
-				break;
-			} else {
-				try {
-					userId = Integer.parseInt(in);
-				} catch (Exception e) {
-					System.out.print("Invalid id, please try again: ");
-				}
-			}
-
-			verified = fs.isHealthCareProvider(userId) || fs.isLabTech(userId) || fs.isEMT(userId);
-			if (!verified) {
-				System.out.print("Invalid id, please try again: ");
-			}
-		}
 
 		System.out.println();
 
-		while (verified && running) {
+		while (running) {
 			System.out.print(
 				"""
 				What would you like to do?
 				1) Chart System
 				2) Sample Manager
 				3) Pre-Hospital Care Reporter (PRC)
-				4) Exit
+				4) Biopsy Manager
+				5) Exit
 				>\s"""
 			);
 
@@ -57,14 +35,20 @@ public class DiagMain {
 				running = false;
 			} else {
 				switch(Integer.parseInt(in)) {
-					case 1 -> {
+					case 1 -> { // Chart System
+						int userId = askUserId(sc, fs);
+
+						if (userId == -1) {
+							break;
+						}
+
 						System.out.print(
 							"""
 							Chart_System
 							Select an option:
 							1) Display All Charts
 							2) Create Chart
-							2) Exit Chart System
+							3) Exit Chart System
 							>\s"""
 						);
 						in = sc.nextLine();
@@ -80,13 +64,62 @@ public class DiagMain {
 							case "3" -> running = false;
 						}
 					}
-					case 2 -> It2Main.sampleManager(userId, fs, sc);
-					case 3 -> It2Main.pcrReporter(userId, fs, sc);
+					case 2 -> {
+						int userId = askUserId(sc, fs);
+
+						if (userId == -1) {
+							break;
+						}
+
+						It2Main.sampleManager(userId, fs, sc);
+					}
+					case 3 -> {
+
+						int userId = askUserId(sc, fs);
+
+						if (userId == -1) {
+							break;
+						}
+
+						It2Main.pcrReporter(userId, fs, sc);
+					}
 					case 4 -> {
+						BiopsyMain.main(sc);
+					}
+					case 5 -> {
 						running = false;
 					}
 				}
 			}
 		}
+	}
+
+	private static int askUserId(Scanner sc, FilerSystem fs) {
+		boolean verified = false;
+		System.out.println("Please log in.");
+		System.out.println("'Exit': leave diagnostic services.");
+		System.out.print("User id: ");
+		int userId = 0;
+
+		while (!verified) {
+			String in = sc.nextLine();
+
+			if (in.equalsIgnoreCase("exit")) {
+				break;
+			} else {
+				try {
+					userId = Integer.parseInt(in);
+					return userId;
+				} catch (Exception e) {
+					System.out.print("Invalid id, please try again: ");
+				}
+			}
+
+			verified = fs.isHealthCareProvider(userId) || fs.isLabTech(userId) || fs.isEMT(userId);
+			if (!verified) {
+				System.out.print("Invalid id, please try again: ");
+			}
+		}
+		return -1;
 	}
 }

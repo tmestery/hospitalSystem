@@ -3,7 +3,7 @@ package diagnostic_services.file_system;
 import diagnostic_services.iteration_2.Ambulance;
 import diagnostic_services.iteration_2.PCR;
 import diagnostic_services.iteration_2.Sample;
-import diagnostic_services.iteration_2.Status;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -22,6 +22,8 @@ public class FilerSystem {
 	private final LinkedHashMap<Integer, roles.EMT> emts = new LinkedHashMap<>();
 	private final LinkedHashMap<Integer, Sample> samples = new LinkedHashMap<>();
 	private final LinkedHashMap<Integer, PCR> pcrs = new LinkedHashMap<>();
+	private final LinkedHashMap<Integer, Biopsy> biopsies = new LinkedHashMap<>();
+
 
 	private static final String PATH_DOC = "./src/diagnostic_services/file_system/Data/doctors.json";
 	private static final String PATH_NUR = "./src/diagnostic_services/file_system/Data/nurses.json";
@@ -30,6 +32,7 @@ public class FilerSystem {
 	private static final String PATH_EMT = "./src/diagnostic_services/file_system/Data/emts.json";
 	private static final String PATH_SAM = "./src/diagnostic_services/file_system/Data/samples.json";
 	private static final String PATH_PCR = "./src/diagnostic_services/file_system/Data/pcrs.json";
+	private static final String PATH_BIO = "./src/diagnostic_services/file_system/Data/biopsies.json";
 
 
 	public FilerSystem() {
@@ -37,6 +40,7 @@ public class FilerSystem {
 		this.loadPatients();
 		this.loadSamples();
 		this.loadPCR();
+		this.loadBiopsies();
 	}
 
 	private void loadPatients() {
@@ -56,6 +60,55 @@ public class FilerSystem {
 			.replace("[", "")
 			.replace("]", "");
 	}
+
+	private void loadBiopsies() {
+    File file = new File(PATH_BIO);
+    try {
+      Scanner sc = new Scanner(file);
+      Biopsy.Category type = null;
+      Doctor doctor = null;
+      Patient patient = null;
+			Status status = null;
+			String notes = "";
+      int id = 0;
+
+      while (sc.hasNextLine()) {
+        String line = sc.nextLine();
+
+        if (line.contains("type")) {
+          String typeStr = cleanVal(line.split(":")[1]);
+          type = Biopsy.Category.valueOf(typeStr);
+        }
+        if (line.contains("doctor")) {
+          int docId = Integer.parseInt(cleanVal(line.split(":")[1]));
+          doctor = this.getDoctorById(docId);
+        }
+        if (line.contains("patient")) {
+          int patId = Integer.parseInt(cleanVal(line.split(":")[1]));
+          patient = this.getPatientById(patId);
+        }
+				if (line.contains("notes")) {
+					notes += cleanVal(line.split(":")[1]);
+				}
+        if (line.contains("id")) {
+          id = Integer.parseInt(cleanVal(line.split(":")[1]));
+        }
+				if (line.contains("status")) {
+					String statusStr = cleanVal(line.split(":")[1]);
+					status = Status.valueOf(statusStr);
+				}
+
+        if (line.contains("}")) {
+          Biopsy biopsy = new Biopsy(type, doctor, patient, status, id);
+					biopsy.setNotes(notes);
+          biopsies.put(id, biopsy);
+        }
+      }
+			sc.close();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
 
 	private void parseChartJson(Scanner sc) {
 		String firstName = "";
@@ -229,6 +282,7 @@ public class FilerSystem {
 		String firstName = "";
 		String lastName = "";
 		int id = 0;
+		Doctor.Specialty specialty = null;
 
 		while (sc.hasNextLine()) {
 			String str = sc.nextLine();
@@ -242,29 +296,38 @@ public class FilerSystem {
 			if (str.contains("id")) {
 				id = Integer.parseInt(cleanVal(str.split(":")[1]));
 			}
+      if (str.contains("specialty")) {
+				String special = cleanVal(str.split(":")[1]);
+        specialty = Doctor.Specialty.valueOf(special);
+      }
 
 			if (str.contains("}")) {
 				switch(type) {
-					case 0: // Doctor
-						Doctor doctor = new Doctor(firstName, lastName, id);
+					case 0 -> {
+						// Doctor
+						Doctor doctor = new Doctor(firstName, lastName, id, specialty);
 						doctors.put(id, doctor);
-						break;
-					case 1: // Nurse
+					}
+					case 1 -> {
+						// Nurse
 						Nurse nurse = new Nurse(firstName, lastName, id);
 						nurses.put(id, nurse);
-						break;
-					case 2: // Patient
+					}
+					case 2 -> {
+						// Patient
 						Patient patient = new Patient(firstName, lastName, id);
 						patients.put(id, patient);
-						break;
-					case 3: // LabTech
+					}
+					case 3 -> {
+						// LabTech
 						LabTech labTech = new LabTech(firstName, lastName, id);
 						labTechs.put(id, labTech);
-						break;
-					case 4: // EMT
+					}
+					case 4 -> {
+						// EMT
 						EMT emt = new EMT(firstName, lastName, id);
 						emts.put(id, emt);
-						break;
+					}
 				}
 			}
 		}
@@ -518,129 +581,160 @@ public class FilerSystem {
 		System.out.println();
   }
 
-	private class FileWriter {
+	public void displayBiopsies() {
+    for (Biopsy biopsy : biopsies.values()) {
+      System.out.println(biopsy);
+    }
 
-		public static void writeJsonToFile(String filePath, String json) {
-			FileWriter.writeToFile(filePath, json);
-		}
+    System.out.println("Total Biopsies: " + biopsies.size());
+  }
 
-		public static void clearFile(String filePath) {
-			FileWriter.eraseFileContents(filePath);
+	public void displayBiopsiesByUserId(int id) {
+		boolean found = false;
+		Doctor doctor = doctors.get(id);
+		for (Biopsy biopsy : biopsies.values()) {
+			if (doctor.getCategory() == biopsy.getType()) {
+				found = true;
+				System.out.println(biopsy);
+			}
 		}
+		if (!found) {
+			System.out.println("There are no biopsies of your field.");
+		}
+		System.out.println("");
 	}
 
+	public Doctor getDoctorById(int id) {
+    return doctors.get(id);
+  }
+
+	public Patient getPatientById(int id) {
+    return patients.get(id);
+  }
+
 	public void saveData() {
-		writeDoctors();
-		writeNurses();
-		writeEMTs();
-		writeLabTechs();
 		writePatients();
 		writeSamples();
 		writePCRs();
 	}
 
-	private void writeDoctors() {
-		Doctors[] _doctors = doctors.values();
-		String content = "[\n";
-
-		for (Doctor doctor : _doctors) {
-			String json = """
-					{
-						"firstName": "%s",
-						"lastName": "%s",
-						"id": %d
-					}
-					"""
-				.formatted(doctor.getFirstName(), doctor.getLastName(), doctor.getId());
-			content = content + json;
-		}
-		content = content + "\n]";
-		FileWriter.writeJsonToFile(PATH_DOC, content);
+	public Biopsy getBiopsyById(int id) {
+		return biopsies.get(id);
 	}
 
-	private void writeNurses() {
-		Nurses[] _nurses = nurses.values();
-		String content = "[\n";
-		for (Nurse nurse : _nurses) {
-			String json = """
-					{
-						"firstName": "%s",
-						"lastName": "%s",
-						"id": %d
-					}
-					"""
-				.formatted(nurse.getFirstName(), nurse.getLastName(), nurse.getId());
-			content = content + json;
-		}
-		content = content + "\n]";
-		FileWriter.writeJsonToFile(PATH_NUR, content);
-	}
+	public void deleteBiopsy(int id) {
+    biopsies.remove(id);
+    reindexBiopsies();
+		writeBiopsies();
+  }
 
-	private void writeEMTs() {
-		EMTs[] _emts = emts.values();
-		String content = "[\n";
-		for (roles.EMT emt : _emts) {
-			String json = """
-					{
-						"firstName": "%s",
-						"lastName": "%s",
-						"id": %d
-					}
-					"""
-				.formatted(emt.getFirstName(), emt.getLastName(), emt.getId());
-			content = content + json;
-		}
-		content = content + "\n]";
-		FileWriter.writeJsonToFile(PATH_EMT, content);
-	}
+	private void reindexBiopsies() {
+    LinkedHashMap<Integer, Biopsy> reindexed = new LinkedHashMap<>();
+    int newId = 1;
+    for (Biopsy biopsy : biopsies.values()) {
+      biopsy.setId(newId);
+      reindexed.put(newId, biopsy);
+      newId++;
+    }
+    biopsies.clear();
+    biopsies.putAll(reindexed);
+  }
 
-	private void writeLabTechs() {
-		LabTechs[] _labTechs = labTechs.values();
-		String content = "[\n";
-		for (LabTech labTech : _labTechs) {
-			String json = """
-					{
-						"firstName": "%s",
-						"lastName": "%s",
-						"id": %d
-					}
-					"""
-				.formatted(labTech.getFirstName(), labTech.getLastName(), labTech.getId());
-			content = content + json;
+	public void save(Biopsy biopsy) {
+		if (biopsy.getId() == 0) {
+			int nextId = biopsies.isEmpty() ? 1 : biopsies.size() + 1;
+			biopsy.setId(nextId);
 		}
-		content = content + "\n]";
-		FileWriter.writeJsonToFile(PATH_LAB, content);
+
+		biopsies.put(biopsy.getId(), biopsy);
+		System.out.println("Biopsy saved with id: " + biopsy.getId());
+		System.out.println();
+		writeBiopsies();
+  }
+
+	private void writeBiopsies() {
+		FileWriter writer;
+		try {
+				writer = new FileWriter(PATH_BIO);
+		} catch (IOException e) {
+				e.printStackTrace();
+				return;
+		}
+
+		String content = "[\n";
+		for (Biopsy biopsy : biopsies.values()) {
+			content += String.format("""
+					{
+					"type": "%s",
+					"doctor": %d,
+					"patient": %d,
+					"status": "%s",
+					"notes": "%s",
+					"id": %d
+					}""",
+					biopsy.getType(),
+					biopsy.getDoctor().getId(),
+					biopsy.getPatient().getId(),
+					biopsy.getStatus(),
+					biopsy.getNotes(),
+					biopsy.getId());
+			if (biopsies.size() > biopsy.getId()) {
+				content += ",\n";
+			}
+		}
+		content += "\n]";
+
+		try {
+				writer.write(content);
+				writer.close();
+		} catch (IOException e) {
+				e.printStackTrace();
+		}
 	}
 
 	private void writePatients() {
-		Chart[] _charts = charts.values();
-		for (Chart chart : _charts) {
-			Patient patient = chart.getPatient();
-
-		}
-
-		Patients[] _patients = patients.values();
 		String content = "[\n";
-		for (Patient patient : _patients) {
+		for (Patient patient : patients.values()) {
 			String json = """
 					{
 						"firstName": "%s",
 						"lastName": "%s",
 						"id": %d,
-						"prevCharts": []
+						"prevCharts": [
 					}
 					"""
 				.formatted(patient.getFirstName(), patient.getLastName(), patient.getId());
 			content = content + json;
+
+			for (Chart chart : charts.values()) {
+				if (patient == chart.getPatient()) {
+					json = """
+							"patientId": %d,
+							"chartId": %d,
+							"userIdIss": %d,
+							"dateIss": "%s",
+							"others": [%d],
+							"allergies": "%s",
+							"additionalNotes": "%s"
+							"""
+							.formatted(
+								chart.getPatient().getId(),
+								chart.getId(),
+								chart.getUser().getId(),
+								chart.getDate(),
+								chart.getOthers(),
+								chart.getAllergies(),
+								chart.getNotes()
+							);
+				}
+			}
 		}
 		content = content + "\n]";
-		FileWriter.writeJsonToFile(PATH_PAT, content);
 	}
 
 	private void writeSamples() {
-		Samples[] _samples = samples.values();
 		String content = "[\n";
-		for (Sample sample : _samples) {
+		for (Sample sample : samples.values()) {
 			String json = """
 					{
 						"id": %d,
@@ -660,13 +754,11 @@ public class FilerSystem {
 			content = content + json;
 		}
 		content = content + "\n]";
-		FileWriter.writeJsonToFile(PATH_SAM, content);
 	}
 
 	private void writePCRs() {
-		PCRs[] _pcrs = pcrs.values();
 		String content = "[\n";
-		for (PCR pcr : _pcrs) {
+		for (PCR pcr : pcrs.values()) {
 			String json = """
 					{
 						"id": %d,
@@ -678,14 +770,13 @@ public class FilerSystem {
 				.formatted(
 					pcr.getId(),
 					pcr.getPatient().getId(),
-					pcr.getAmbulance().getEmt().get(0).getId(),
-					pcr.getAmbulance().getEmt().get(1).getId(),
+					pcr.getAmbulance().getEMT().get(0).getId(),
+					pcr.getAmbulance().getEMT().get(1).getId(),
 					pcr.getNotes()
 				);
 			content = content + json;
 		}
 		content = content + "\n]";
-		FileWriter.writeJsonToFile(PATH_PCR, content);
 	}
 
 }

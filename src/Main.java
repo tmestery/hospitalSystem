@@ -2,7 +2,6 @@ import administrative_services.onboarding_manager.ConsoleApp;
 import administrative_services.compensation_manager.CompensationConsoleApp;
 import administrative_services.scheduling_manager.StaffSchedulingSystem;
 import diagnostic_services.DiagMain;
-import food_nutrition_manager.FoodAndNutritionManager;
 import java.util.Scanner;
 import nursing_services.NurMain;
 import support_services.cleaningStaff;

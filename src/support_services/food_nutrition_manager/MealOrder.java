@@ -1,4 +1,4 @@
-package food_nutrition_manager;
+package support_services.food_nutrition_manager;
 
 public class MealOrder {
 

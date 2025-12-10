@@ -2,12 +2,13 @@
 	{
 		"firstName": "James",
 		"lastName": "Lee",
-		"id": 6928
+		"id": 6921,
+		"specialty": "RADIOLOGY"
 	},
-
 	{
 		"firstName": "Obama",
 		"lastName": "Care",
-		"id": 1234
+		"id": 1234,
+		"specialty": "DERMATOLOGY"
 	}
 ]
